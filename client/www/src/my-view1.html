@@ -29,8 +29,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div>
       <h1>Hi {{carrier.Name}}</h1>
 	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
-		<google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{latitude}}" longitude="{{longitude}}" draggable="false" info="{{infoObj}}">
-        </google-map-marker>
+		<template is="dom-repeat" items="{{currentLocation}}">
+			<google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false">
+			</google-map-marker>
+		</template>
 		<template is="dom-repeat" items="{{loads.nearbyLoads}}">
           <google-map-marker icon="/www/images/Container-icon.gif" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false">
           </google-map-marker>
@@ -80,6 +82,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			navigator.geolocation.getCurrentPosition(function(position){
 				self.latitude = position.coords.latitude;
 				self.longitude = position.coords.longitude;
+				self.currentLocation = [{"latitude":self.latitude,
+										 "longitude":self.longitude
+										}];
 				self.region.kmsValue = 5000;
 				self.region.latitude = self.latitude;
 				self.region.longitude = self.longitude;
