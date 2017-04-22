@@ -22,7 +22,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			}
     </style>
     <iron-ajax url='/api/Loads?filter={"where":{"Status":"open"}}'  last-response="{{loads}}" auto></iron-ajax>
-     <iron-ajax url='/api/Loads?filter={"where":{"Status":"transit"}}'  last-response="{{dispatches}}" auto></iron-ajax>
+    <iron-ajax url='/api/Loads?filter={"where":{"Status":"transit"}}'  last-response="{{dispatches}}" auto></iron-ajax>
+    <iron-ajax url='/api/Carriers?filter={"where":{"Status":"wait"}}'  last-response="{{driversWaiting}}" auto></iron-ajax>
     <div class="card">
       <!--<div class="circle">4</div>-->
       <h1>XPO Tracking Dashboard</h1>
@@ -32,6 +33,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </template>
         <template is="dom-repeat" items="{{dispatches}}">
           <google-map-marker icon="/www/images/xpo-truck.png" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false"></google-map-marker>
+        </template>
+        <template is="dom-repeat" items="{{driversWaiting}}">
+          <google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{item.Latitude}}" longitude="{{item.Longitude}}" draggable="false"></google-map-marker>
         </template>
       </google-map>
    </div>
