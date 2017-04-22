@@ -78,26 +78,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		  var self = this;
 		  self.$.ajaxGetLoad1.url ="/api/Carriers/"+this.driverName;
 		  self.$.ajaxGetLoad1.generateRequest();
-		  if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(function(position){
-				self.latitude = position.coords.latitude;
-				self.longitude = position.coords.longitude;
-				self.currentLocation = [{"latitude":self.latitude,
-										 "longitude":self.longitude
-										}];
-				self.region.kmsValue = 5000;
-				self.region.latitude = self.latitude;
-				self.region.longitude = self.longitude;
-				self.$.ajaxGetLoad.body = self.region;
-				self.$.ajaxGetLoad.generateRequest();
-			});
-		  } else { 
-			alert("Geolocation feature not supported");
-		  }
 	  },
 	  changeLatitude:function(){
 		var self = this;
 		self.$.ajaxPutLoad.url ="/api/Carriers/"+this.driverName;
+		if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(function(position){
 			self.latitude = position.coords.latitude;
 			self.longitude = position.coords.longitude;
@@ -105,7 +90,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			self.carrier.Longitude = self.longitude;
 			self.$.ajaxPutLoad.body = self.carrier;
 			self.$.ajaxPutLoad.generateRequest();
-		});		
+			self.currentLocation = [{"latitude":self.latitude,
+										 "longitude":self.longitude
+										}];
+			if(self.carrier.Status === 'wait'){
+				self.region.kmsValue = 5000;
+				self.region.latitude = self.latitude;
+				self.region.longitude = self.longitude;
+				self.$.ajaxGetLoad.body = self.region;
+				self.$.ajaxGetLoad.generateRequest();
+			}
+		});
+		} else { 
+			alert("Geolocation feature not supported");
+		}
 	  }
 	  });
   </script>
