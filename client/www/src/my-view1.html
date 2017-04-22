@@ -27,7 +27,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<iron-ajax id="ajaxPutLoad" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
 
     <div>
-      <h1>Hi {{carrier.Name}} {{latitude}}</h1>
+      <h1>Hi {{carrier.Name}}</h1>
 	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
 		<template is="dom-repeat" items="{{loads2}}">
 			<google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false" animation="BOUNCE">
