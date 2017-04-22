@@ -9,24 +9,89 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view3">
   <template>
     <style include="shared-styles">
     </style>
-
+    <iron-ajax id="ajaxGetLoad" url="/api/Carriers/getRoundtripLoads" method='POST' handle-as="json" on-response="handleResponse" last-response="{{roundtripLoads}}" content-type="application/json"></iron-ajax>
     <div class="card">
       <div class="circle">3</div>
-      <h1>View Three</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
+      <h1>Roundtrips</h1>
+      <template is="dom-repeat" items="{{roundtripLoadsWithCityNames}}">
+        <div class="card">
+          {{item.City}},{{item.State}},{{item.PickupDateTime}},{{item.DeliveryDateTime}}
+          <hr>
+          {{item.City}},{{item.State}},{{item.PickupDateTime}},{{item.DeliveryDateTime}}
+        </div>
+      </template>
     </div>
   </template>
 
   <script>
     Polymer({
       is: 'my-view3',
+      attached: function(){
+        var self = this;
+        var region = {};
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position){
+            region.kmsValue = 5000;
+            region.latitude = position.coords.latitude;
+            region.longitude = position.coords.longitude;
+            self.$.ajaxGetLoad.body = region;
+            self.$.ajaxGetLoad.generateRequest();
+          });
+        } else { 
+          alert("Geolocation feature not supported");
+        }
+      },
+      handleResponse: function(){
+        this.loads = this.roundtripLoads.roundtripLoads;
+        for(i=0; i<this.loads.length; i++){
+          this.getCityNames(i); 
+        }
+        var self = this;
+        setTimeout(function(){
+          self.roundtripLoadsWithCityNames = undefined;
+          self.roundtripLoadsWithCityNames = self.loads;
+        },300);
+
+
+      },
+      getCityNames: function(i){
+        var self = this;
+        var geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(this.loads[i].SourceLatitude, this.loads[i].SourceLongitude);
+
+        geocoder.geocode(
+          {'latLng': latlng}, 
+          function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    var add= results[0].formatted_address ;
+                    var  value=add.split(",");
+
+                    var count=value.length;
+                    var country=value[count-1];
+                    var state=value[count-2];
+                    var city=value[count-3];
+                    self.loads[i].City = city;
+                    self.loads[i].State = state;
+                    //alert(city,state);
+                }
+                else  {
+                    //alert("address not found");
+                }
+              }
+              else {
+                 // alert("Geocoder failed due to: " + status);
+              }
+          }
+        );
+      }
     });
   </script>
 </dom-module>
