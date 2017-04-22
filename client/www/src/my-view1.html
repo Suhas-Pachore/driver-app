@@ -23,11 +23,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			}
     </style>
 	<iron-ajax id="ajaxGetLoad" url="/api/Carriers/getNearbyLoads" method='POST' handle-as="json" last-response="{{loads}}" content-type="application/json" on-response="handleResponse"></iron-ajax>
+	<iron-ajax id="ajaxGetLoad1" method='GET' handle-as="json" content-type="application/json" last-response="{{carrier}}"></iron-ajax>
+	<iron-ajax id="ajaxPutLoad" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
 
     <div class="card">
-      <h1>Hi Driver Name</h1>
+      <h1>Hi {{carrier.Name}}</h1>
 	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
-		<google-map-marker latitude="{{latitude}}" longitude="{{longitude}}" draggable="false">
+		<google-map-marker latitude="{{latitude}}" longitude="{{longitude}}" draggable="false" info="{{infoObj}}">
         </google-map-marker>
 		<template is="dom-repeat" items="{{loads.nearbyLoads}}">
           <google-map-marker latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false">
@@ -59,10 +61,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		loads:{
 			type:Object,
 			notify:true
-		}
 		},
+		driverName:{
+			type:String,
+			value:"car001"
+		},
+		carrier:{
+			type:Object,
+			notify:true,
+			observer:"changeLatitude"
+		}
+	  },	
 	  attached:function(){
 		  var self = this;
+		  self.$.ajaxGetLoad1.url ="/api/Carriers/"+this.driverName;
+		  self.$.ajaxGetLoad1.generateRequest();
 		  if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function(position){
 				self.latitude = position.coords.latitude;
@@ -76,6 +89,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		  } else { 
 			alert("Geolocation feature not supported");
 		  }
+	  },
+	  changeLatitude:function(){
+		var self = this;
+		self.$.ajaxPutLoad.url ="/api/Carriers/"+this.driverName;
+		navigator.geolocation.getCurrentPosition(function(position){
+			self.latitude = position.coords.latitude;
+			self.longitude = position.coords.longitude;
+			self.carrier.Latitude = self.latitude;
+			self.carrier.Longitude = self.longitude;
+			self.$.ajaxPutLoad.body = self.carrier;
+			self.$.ajaxPutLoad.generateRequest();
+		});		
 	  }
 	  });
   </script>
