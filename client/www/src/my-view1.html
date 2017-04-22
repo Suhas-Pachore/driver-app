@@ -9,29 +9,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-map/google-map.html">
+<link rel="import" href="../bower_components/google-map/google-map-marker.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
   <template>
     <style include="shared-styles">
-      :host {
-        display: block;
-
-        padding: 10px;
-      }
+	.map-height{
+		height:65vh;
+	}
     </style>
 
     <div class="card">
-      <div class="circle">1</div>
-      <h1>View One</h1>
-      <p>Ut labores minimum atomorum pro. Laudem tibique ut has.</p>
-      <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</p>
+      <h1>Hi Driver Name {{latitude}}</h1>
+	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
+		<google-map-marker latitude="{{latitude}}" longitude="{{longitude}}" draggable="true"></google-map-marker>
+	  </google-map>
     </div>
   </template>
 
   <script>
     Polymer({
       is: 'my-view1',
+	  properties:{
+		latitude:{
+			type:Number,
+			value :0,
+			notify:true
+		},
+		longitude:{
+			type:Number,
+			value :0,
+			notify:true
+		}
+	  },
+	  attached:function(){
+		  var self = this;
+		  if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position){
+				self.latitude = position.coords.latitude;
+				self.longitude = position.coords.longitude;
+			});
+		  } else { 
+			alert("Geolocation feature not supported");
+		  }
+	  }
     });
   </script>
 </dom-module>
