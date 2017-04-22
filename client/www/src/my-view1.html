@@ -27,15 +27,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<iron-ajax id="ajaxPutLoad" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
 
     <div>
-      <h1>Hi {{carrier.Name}}</h1>
+      <h1>Hi {{carrier.Name}} {{latitude}}</h1>
 	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
-		<template is="dom-repeat" items="{{currentLocation}}">
-			<google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false">
+		<template is="dom-repeat" items="{{loads2}}">
+			<google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false" animation="BOUNCE">
+				<div>Address:{{item.location}}</div>
 			</google-map-marker>
 		</template>
-		<template is="dom-repeat" items="{{loads.nearbyLoads}}">
-          <google-map-marker icon="/www/images/Container-icon.gif" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false">
-          </google-map-marker>
+		<template is="dom-repeat" items="{{loads1}}">
+          <google-map-marker icon="/www/images/Container-icon.gif" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false" animation="BOUNCE">
+			<div>Address:{{item.location}}</div>
+		  </google-map-marker>
         </template>
 	  </google-map>
     </div>
@@ -93,6 +95,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			self.currentLocation = [{"latitude":self.latitude,
 										 "longitude":self.longitude
 										}];
+			for(var i=0;i<self.currentLocation.length;i++)
+				self.locationName1(self.currentLocation.latitude,self.currentLocation.longitude,i);
+			setTimeout(function(){
+				self.loads2 = self.currentLocation;
+			},300);
 			if(self.carrier.Status === 'wait'){
 				self.region.kmsValue = 5000;
 				self.region.latitude = self.latitude;
@@ -104,6 +111,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		} else { 
 			alert("Geolocation feature not supported");
 		}
+	  },
+	  handleResponse: function(){
+		var self = this;
+		for(var i=0;i<this.loads.nearbyLoads.length;i++)
+			this.locationName(this.loads.nearbyLoads[i].CurrentLatitude,this.loads.nearbyLoads[i].CurrentLongitude,i);
+		setTimeout(function(){
+			self.loads1 = self.loads.nearbyLoads;
+		},300);
+	  },
+	  locationName : function(latitude, longitude, index){
+		var geocoder;
+		var self = this;
+		geocoder = new google.maps.Geocoder();
+		var latlng = new google.maps.LatLng(latitude, longitude);
+		var add;
+		geocoder.geocode(
+			{'latLng': latlng}, 
+			function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+						if (results[0]) {
+							add= results[0].formatted_address;
+							self.loads.nearbyLoads[index].location = add;
+						}
+						else  {
+							add = "address not found";
+							self.loads.nearbyLoads[index].location = add;
+						}
+				}
+				 else {
+					add = "address not found";
+					self.loads.nearbyLoads[index].location = add;
+				}
+			}
+		);
+	  },
+	  locationName1 : function(latitude, longitude, index){
+		var geocoder;
+		var self = this;
+		geocoder = new google.maps.Geocoder();
+		var latlng = new google.maps.LatLng(latitude, longitude);
+		var add;
+		geocoder.geocode(
+			{'latLng': latlng}, 
+			function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+						if (results[0]) {
+							add= results[0].formatted_address;
+							self.currentLocation[index].location = add;
+						}
+						else  {
+							add = "address not found";
+							self.currentLocation[index].location = add;
+						}
+				}
+				 else {
+					add = "address not found";
+					self.currentLocation[index].location = add;
+				}
+			}
+		);
 	  }
 	  });
   </script>
