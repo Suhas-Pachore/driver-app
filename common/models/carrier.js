@@ -12,15 +12,14 @@ module.exports = function(Carrier) {
 
     Carrier.getNearbyLoads = function(msg, cb){
         var nearbyLoads = [];
-		var latitude = 120;
-		var longitude = 120;
+		var region = msg.body;
 		var load = loopback.findModel('Load');
         load.find(undefined, function(error, nearbyLoads){
             for(var i=0;i<nearbyLoads.length;i++){
 				var flag = geolib.isPointInCircle(
 					{latitude: nearbyLoads[i].SourceLatitude, longitude: nearbyLoads[i].SourceLongitude},
-					{latitude: latitude, longitude: longitude},
-					5
+					{latitude: region.latitude, longitude: region.longitude},
+					region.kmsValue
 				);
 				if(!flag)
 				{
@@ -38,7 +37,7 @@ module.exports = function(Carrier) {
     });
 
     Carrier.remoteMethod('getNearbyLoads',{
-        accepts: {arg: 'msg', type:'Object'},
+        accepts: {arg: 'msg', type: 'Object', 'http': {source: 'req'}},
         returns: {arg: 'nearbyLoads', type:'array'}
     });
 

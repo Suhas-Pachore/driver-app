@@ -12,6 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-map/google-map.html">
 <link rel="import" href="../bower_components/google-map/google-map-marker.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
@@ -21,11 +22,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				height:65vh;
 			}
     </style>
+	<iron-ajax id="ajaxGetLoad" url="/api/Carriers/getNearbyLoads" method='POST' handle-as="json" last-response="{{loads}}" content-type="application/json" on-response="handleResponse"></iron-ajax>
 
     <div class="card">
-      <h1>Hi Driver Name {{latitude}}</h1>
+      <h1>Hi Driver Name</h1>
 	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
-		<google-map-marker latitude="{{latitude}}" longitude="{{longitude}}" draggable="true"></google-map-marker>
+		<google-map-marker latitude="{{latitude}}" longitude="{{longitude}}" draggable="false">
+        </google-map-marker>
+		<template is="dom-repeat" items="{{loads.nearbyLoads}}">
+          <google-map-marker latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false">
+          </google-map-marker>
+        </template>
 	  </google-map>
     </div>
   </template>
@@ -43,19 +50,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			type:Number,
 			value :0,
 			notify:true
+		},
+		region:{
+			type:Object,
+			value:{},
+			notify:true
+		},
+		loads:{
+			type:Object,
+			notify:true
 		}
-	  },
+		},
 	  attached:function(){
 		  var self = this;
 		  if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function(position){
 				self.latitude = position.coords.latitude;
 				self.longitude = position.coords.longitude;
+				self.region.kmsValue = 5000;
+				self.region.latitude = self.latitude;
+				self.region.longitude = self.longitude;
+				self.$.ajaxGetLoad.body = self.region;
+				self.$.ajaxGetLoad.generateRequest();
 			});
 		  } else { 
 			alert("Geolocation feature not supported");
 		  }
 	  }
-    });
+	  });
   </script>
 </dom-module>
