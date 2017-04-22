@@ -37,5 +37,17 @@
   },
   "Note": {
     "dataSource": "db"
+  },
+  "Customer": {
+    "dataSource": "mongods",
+    "public": true
+  },
+  "Carrier": {
+    "dataSource": "mongods",
+    "public": true
+  },
+  "Load": {
+    "dataSource": "mongods",
+    "public": true
   }
 }

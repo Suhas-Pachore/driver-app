@@ -1,0 +1,55 @@
+{
+  "name": "Load",
+  "plural": "Loads",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "LoadId": {
+      "type": "string",
+      "required": true
+    },
+    "CustomerId": {
+      "type": "string"
+    },
+    "CarrierId": {
+      "type": "string"
+    },
+    "Type": {
+      "type": "string"
+    },
+    "SourceLatitude": {
+      "type": "string"
+    },
+    "SourceLongitude": {
+      "type": "string"
+    },
+    "DestinationLatitude": {
+      "type": "string"
+    },
+    "DestinationLongitude": {
+      "type": "string"
+    },
+    "CurrentLatitude": {
+      "type": "string"
+    },
+    "CurrentLongitude": {
+      "type": "string"
+    },
+    "PickupDateTime": {
+      "type": "date"
+    },
+    "DeliveryDateTime": {
+      "type": "date"
+    },
+    "Status": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

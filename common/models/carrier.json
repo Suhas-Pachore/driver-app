@@ -1,0 +1,45 @@
+{
+  "name": "Carrier",
+  "plural": "Carriers",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "CarrierId": {
+      "type": "string",
+      "id": true,
+      "required": true
+    },
+    "Name": {
+      "type": "string"
+    },
+    "Type": {
+      "type": "string",
+      "required": true
+    },
+    "Status": {
+      "type": "string",
+      "required": true
+    },
+    "Latitude": {
+      "type": "string",
+      "required": true
+    },
+    "Longitude": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "loads": {
+      "type": "hasMany",
+      "model": "Load",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
