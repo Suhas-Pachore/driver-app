@@ -37,7 +37,7 @@
     "loads": {
       "type": "hasMany",
       "model": "Load",
-      "foreignKey": ""
+      "foreignKey": "CarrierId"
     }
   },
   "acls": [],

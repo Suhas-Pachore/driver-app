@@ -1,0 +1,26 @@
+[
+  {
+    "CarrierId": "car001",
+    "Name": "Dave Greene",
+    "Type": "small",
+    "Status": "wait",
+    "Latitude": "1.1",
+    "Longitude": "1.2"
+  },
+  {
+    "CarrierId": "car002",
+    "Name": "Pete Hogg",
+    "Type": "large",
+    "Status": "wait",
+    "Latitude": "2.1",
+    "Longitude": "3.2"
+  },
+  {
+    "CarrierId": "car003",
+    "Name": "Jack Dee",
+    "Type": "medium",
+    "Status": "wait",
+    "Latitude": "4.1",
+    "Longitude": "3.4"
+  }
+]

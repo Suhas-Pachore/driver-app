@@ -2,14 +2,15 @@
   "name": "Load",
   "plural": "Loads",
   "base": "PersistedModel",
-  "idInjection": true,
+  "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "properties": {
     "LoadId": {
       "type": "string",
-      "required": true
+      "required": true,
+      "id": true
     },
     "CustomerId": {
       "type": "string"
