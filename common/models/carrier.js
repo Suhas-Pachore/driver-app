@@ -14,7 +14,7 @@ module.exports = function(Carrier) {
         var nearbyLoads = [];
 		var region = msg.body;
 		var load = loopback.findModel('Load');
-        load.find(undefined, function(error, nearbyLoads){
+        load.find({where: {status: 'open'}}, function(error, nearbyLoads){
             for(var i=0;i<nearbyLoads.length;i++){
 				var flag = geolib.isPointInCircle(
 					{latitude: nearbyLoads[i].SourceLatitude, longitude: nearbyLoads[i].SourceLongitude},
