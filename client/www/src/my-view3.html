@@ -11,32 +11,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 
 <dom-module id="my-view3">
   <template>
     <style include="shared-styles">
-      .pair {
-        background-color: darkred;
-        color: white;
-        margin: 6px;
-        padding: 3px;
-      }
-      .half {
-        width: 45%;
-      }
+		.flex-layout{
+			display:flex
+		}
     </style>
     <iron-ajax id="ajaxGetLoad" url="/api/Carriers/getRoundtripLoads" method='POST' handle-as="json" on-response="handleResponse" last-response="{{roundtripLoads}}" content-type="application/json"></iron-ajax>
     <div>
-      <h1>Roundtrips</h1>
+      <h1 class="background-color">Roundtrips</h1>
       <template is="dom-repeat" items="{{roundtripLoadsWithCityNames}}">
-        <div class="pair">
+        <div>
             <template is="dom-repeat" items="{{item}}">
-              <div class="half">
-                {{item.srcCity}}, {{item.srcState}}, {{item.PickupDateTime}}, 
+			<div class="flex-layout card">
+              <div style="flex:2">
+                <div><strong>{{item.srcCity}}</strong></div>
+				<div>{{item.srcState}}</div> 
+				<div>{{changeDate(item.PickupDateTime)}}</div> 
               </div>
-              <div class="half"> 
-                {{item.dstCity}}, {{item.dstState}}, {{item.DeliveryDateTime}}
+			  <div style="flex:1">
+				<img src="../img/images.png"/ style="width:40px">
+			  </div> 
+              <div style="flex:2"> 
+                <div><strong>{{item.dstCity}}</strong></div> 
+				<div>{{item.dstState}}</div> 
+				<div>{{changeDate(item.DeliveryDateTime)}}</div>
                 </div>
+			</div>
             </template>
         </div>
       </template>
@@ -60,6 +64,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           alert("Geolocation feature not supported");
         }
       },
+	  changeDate: function(date){
+	    var date = new Date();
+		return date.getDate() + "/" + (date.getMonth()+1) + "/" + (1900+ date.getYear())+ " " + date.getUTCHours() + ":" + date.getUTCMinutes();
+	  },
       handleResponse: function(){
         this.loadPairs = this.roundtripLoads.roundtripLoads;
         for(i=0; i<this.loadPairs.length; i++){
