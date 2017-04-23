@@ -23,18 +23,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <iron-ajax id="ajaxGetLoad" url="/api/Carriers/getRoundtripLoads" method='POST' handle-as="json" on-response="handleResponse" last-response="{{roundtripLoads}}" content-type="application/json"></iron-ajax>
     <div>
-      <h1 class="background-color">Roundtrips</h1>
+      <h1 class="background-color">Round trip</h1>
       <template is="dom-repeat" items="{{roundtripLoadsWithCityNames}}">
-        <div class="card" style="padding:3px;margin:0px;background-color:#E53935;">
+        <br/>
+			
+		<div class="card" style="padding:3px;margin:0px;background-color:#E53935;">
             <template is="dom-repeat" items="{{item}}">
-			<div class="flex-layout" style="margin:6px;background-color:rgba(255,255,255,.75);padding:9px">
+			<div class="flex-layout" style="margin:6px;background-color:rgba(255,255,255,.80);padding:9px">
               <div style="flex:2;">
                 <div><strong>{{item.srcCity}}</strong></div>
 				<div>{{item.srcState}}</div> 
 				<div>{{changeDate(item.PickupDateTime)}}</div> 
               </div>
 			  <div style="flex:1">
-				<paper-icon-button icon="trending-flat"></paper-icon-button>
+				<image src="../img/images.png" style="width:50px;">
 			  </div> 
               <div style="flex:2"> 
                 <div><strong>{{item.dstCity}}</strong></div> 
