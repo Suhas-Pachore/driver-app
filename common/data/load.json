@@ -35,8 +35,8 @@
     "SourceLongitude":"77.3807352",
     "DestinationLatitude":"18.606208",
     "DestinationLongitude":"73.6805499",
-    "CurrentLatitude":"12.974517",
-    "CurrentLongitude":"77.3507352",
+    "CurrentLatitude":"15.974517",
+    "CurrentLongitude":"75.3507352",
     "PickupDateTime": "2017-04-22T12:10:01.202Z",
     "DeliveryDateTime": "2017-04-23T17:10:01.202Z",
     "Status": "open"
