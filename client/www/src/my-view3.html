@@ -12,6 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 
 <dom-module id="my-view3">
   <template>
@@ -24,16 +25,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div>
       <h1 class="background-color">Roundtrips</h1>
       <template is="dom-repeat" items="{{roundtripLoadsWithCityNames}}">
-        <div>
+        <div class="card" style="padding:3px;margin:0px;background-color:#E53935;">
             <template is="dom-repeat" items="{{item}}">
-			<div class="flex-layout card">
-              <div style="flex:2">
+			<div class="flex-layout" style="margin:6px;background-color:rgba(255,255,255,.75);padding:9px">
+              <div style="flex:2;">
                 <div><strong>{{item.srcCity}}</strong></div>
 				<div>{{item.srcState}}</div> 
 				<div>{{changeDate(item.PickupDateTime)}}</div> 
               </div>
 			  <div style="flex:1">
-				<img src="../img/images.png"/ style="width:40px">
+				<paper-icon-button icon="trending-flat"></paper-icon-button>
 			  </div> 
               <div style="flex:2"> 
                 <div><strong>{{item.dstCity}}</strong></div> 
