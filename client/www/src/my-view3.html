@@ -15,14 +15,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="my-view3">
   <template>
     <style include="shared-styles">
+      .pair {
+        background-color: darkred;
+        color: white;
+        margin: 6px;
+        padding: 3px;
+      }
+      .half {
+        width: 45%;
+      }
     </style>
     <iron-ajax id="ajaxGetLoad" url="/api/Carriers/getRoundtripLoads" method='POST' handle-as="json" on-response="handleResponse" last-response="{{roundtripLoads}}" content-type="application/json"></iron-ajax>
-    <div class="card">
-      <div class="circle">3</div>
+    <div>
       <h1>Roundtrips</h1>
       <template is="dom-repeat" items="{{roundtripLoadsWithCityNames}}">
-        <div class="card">
-            Location - {{item.City}}, State - {{item.State}}, Pickup Date - {{item.PickupDateTime}}, Delivery Date -{{item.DeliveryDateTime}}
+        <div class="pair">
+            <template is="dom-repeat" items="{{item}}">
+              <div class="half">
+                {{item.srcCity}}, {{item.srcState}}, {{item.PickupDateTime}}, 
+              </div>
+              <div class="half"> 
+                {{item.dstCity}}, {{item.dstState}}, {{item.DeliveryDateTime}}
+                </div>
+            </template>
         </div>
       </template>
     </div>
@@ -46,28 +61,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
       handleResponse: function(){
-        this.loads = this.roundtripLoads.roundtripLoads[0].drops;
-          console.log(this.roundtripLoads);
-        for(i=0; i<this.loads.length; i++){
-            console.log(this.loads[i]);
-          this.getCityNames(i); 
+        this.loadPairs = this.roundtripLoads.roundtripLoads;
+        for(i=0; i<this.loadPairs.length; i++){
+            console.log(this.loadPairs[i]);
+            this.getCityNames(i,0); 
+            this.getCityNames(i,1); 
         }
         var self = this;
         setTimeout(function(){
           self.roundtripLoadsWithCityNames = undefined;
-          self.roundtripLoadsWithCityNames = self.loads;
-        },300);
+          self.roundtripLoadsWithCityNames = self.loadPairs;
+        },700);
 
 
       },
-      getCityNames: function(i){
+      getCityNames: function(i,j){
         var self = this;
-        var geocoder = new google.maps.Geocoder();
+        var geocoder1 = new google.maps.Geocoder();
           
-        var latlng = new google.maps.LatLng(this.loads[i].DestinationLatitude, this.loads[i].DestinationLongitude);
+        var latlng1 = new google.maps.LatLng(this.loadPairs[i][j].SourceLatitude, this.loadPairs[i][j].SourceLongitude);
           
-        geocoder.geocode(
-          {'latLng': latlng}, 
+        geocoder1.geocode(
+          {'latLng': latlng1}, 
           function(results, status) {
               if (status == google.maps.GeocoderStatus.OK) {
                 if (results[0]) {
@@ -78,8 +93,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     var country=value[count-1];
                     var state=value[count-2];
                     var city=value[count-3];
-                    self.loads[i].City = city;
-                    self.loads[i].State = state;
+                    self.loadPairs[i][j].srcCity = city;
+                    self.loadPairs[i][j].srcState = state;
+                    //alert(city,state);
+                }
+                else  {
+                    //alert("address not found");
+                }
+              }
+              else {
+                 // alert("Geocoder failed due to: " + status);
+              }
+          }
+        );
+
+        var geocoder2 = new google.maps.Geocoder();
+        var latlng2 = new google.maps.LatLng(this.loadPairs[i][j].DestinationLatitude, this.loadPairs[i][j].DestinationLongitude);
+          
+        geocoder2.geocode(
+          {'latLng': latlng2}, 
+          function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    var add= results[0].formatted_address ;
+                    var  value=add.split(",");
+
+                    var count=value.length;
+                    var country=value[count-1];
+                    var state=value[count-2];
+                    var city=value[count-3];
+                    self.loadPairs[i][j].dstCity = city;
+                    self.loadPairs[i][j].dstState = state;
                     //alert(city,state);
                 }
                 else  {

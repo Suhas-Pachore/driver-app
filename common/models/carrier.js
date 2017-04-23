@@ -12,30 +12,36 @@ module.exports = function(Carrier) {
             
         var len = allLoads.length;
         for(var i = 0 ;i<len ;i++){
-                            var neardist = Math.abs(msg.latitude - allLoads[i].SourceLatitude) + Math.abs(msg.longitude - allLoads[i].SourceLongitude);
+            var selectedPair=[];
+            var neardist = Math.abs(msg.latitude - allLoads[i].SourceLatitude) + Math.abs(msg.longitude - allLoads[i].SourceLongitude);
             if(neardist < 0.3){
                 var originaldist = Math.abs(msg.latitude - allLoads[i].DestinationLatitude) + Math.abs(msg.longitude - allLoads[i].DestinationLongitude);
                 console.log("------got near pickup-------");
                 console.log(allLoads[i].LoadId+" "+originaldist +" near dist:"+neardist);
                 for(var j=0;j<len;j++){
+                    var minDiff = undefined;
+                    
                     var neardist = Math.abs(allLoads[i].DestinationLatitude - allLoads[j].SourceLatitude) + Math.abs(allLoads[i].DestinationLongitude - allLoads[j].SourceLongitude);
                     console.log("--------------new near dist--------------");
                     console.log(neardist);
                     if(neardist < 0.3){
-                    var currentDist = Math.abs(allLoads[j].DestinationLatitude - msg.latitude)+
-                    Math.abs(allLoads[j].DestinationLongitude - msg.longitude);
-                        console.log("*************"+currentDist);
-                    if(originaldist >= currentDist){
-                        console.log("------got drop pickup-------");
-                        console.log(allLoads[j].LoadId +" "+currentDist);
-                        result[i] = {
-                            source : allLoads[i],
-                            drops:[allLoads[i]]
-                        };
-                        result[i].drops.push(allLoads[j]);
+                        var currentDist = Math.abs(allLoads[j].DestinationLatitude - msg.latitude)+
+                        Math.abs(allLoads[j].DestinationLongitude - msg.longitude);
+                            console.log("*************"+currentDist);
+                        if(originaldist >= currentDist){
+                            console.log("------got drop pickup-------");
+                            if((minDiff == undefined) || (minDiff > currentDist)){
+                                minDiff = currentDist;
+                                selectedPair = [allLoads[i],allLoads[j]];
+                            } 
+                            console.log(allLoads[j].LoadId +" "+currentDist);
+
                     }}
                 
-                }}
+                }
+                result.push(selectedPair) ;
+                
+                }
             }
             console.log(result);
             cb(error,result);
