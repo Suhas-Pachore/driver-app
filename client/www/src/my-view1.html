@@ -12,7 +12,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-map/google-map.html">
 <link rel="import" href="../bower_components/google-map/google-map-marker.html">
+<link rel="import" href="../bower_components/google-map-directions/google-map-directions.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-view1">
@@ -25,22 +27,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<iron-ajax id="ajaxGetLoad" url="/api/Carriers/getNearbyLoads" method='POST' handle-as="json" last-response="{{loads}}" content-type="application/json" on-response="handleResponse"></iron-ajax>
 	<iron-ajax id="ajaxGetLoad1" method='GET' handle-as="json" content-type="application/json" last-response="{{carrier}}"></iron-ajax>
 	<iron-ajax id="ajaxPutLoad" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
+	<iron-ajax id="ajaxPutLoad1" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
 
+	<paper-dialog id="nested">
+	  <h3><u>Details</u></h3>
+	  <div>Pickup Address : <strong>{{loadData.source}}</strong></div>
+	  <div>Destination Address : <strong>{{loadData.destination}}</strong></div>
+	  <div>Pickup date : <strong>{{changeDate(loadData.PickupDateTime)}}</strong></div>	  
+	  <div>Delivery date : <strong>{{changeDate(loadData.DeliveryDateTime)}}</strong></div>	  
+	  <div>Load Type : <strong>{{loadData.Type}}</strong></div>	  
+	  <div class="buttons">
+		<paper-button on-tap="doBooking">Book</paper-button>
+	  </div>
+	  <div class="buttons">
+		<paper-button dialog-dismiss>Cancel</paper-button>
+	  </div>
+	</paper-dialog>
+	
+	
     <div>
       <h1>Hi {{carrier.Name}}</h1>
 	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
-		<template is="dom-repeat" items="{{loads2}}">
-			<google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false" animation="BOUNCE">
-				<div>Address:{{item.location}}</div>
+		<template is="dom-repeat" items="{{currentLocation}}">
+			<google-map-marker latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false" animation="BOUNCE">
 			</google-map-marker>
 		</template>
-		<template is="dom-repeat" items="{{loads1}}">
-          <google-map-marker icon="/www/images/Container-icon.gif" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false" animation="BOUNCE">
-			<div>Address:{{item.location}}</div>
+		<template is="dom-repeat" items="{{loads.nearbyLoads}}">
+          <google-map-marker icon="/www/images/Container-icon.gif" latitude="{{item.CurrentLatitude}}" data="{{item}}" id="{{item.CustomerId}}" longitude="{{item.CurrentLongitude}}" draggable="false" animation="BOUNCE" click-events="true" on-google-map-marker-click="openDialog">
 		  </google-map-marker>
         </template>
 	  </google-map>
-    </div>
+	</div>
   </template>
 
   <script>
@@ -74,14 +91,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			type:Object,
 			notify:true,
 			observer:"changeLatitude"
+		},
+		loadData:{
+			type:Object,
+			notify:true
 		}
 	  },	
 	  attached:function(){
-		  var self = this;
-		  self.$.ajaxGetLoad1.url ="/api/Carriers/"+this.driverName;
-		  self.$.ajaxGetLoad1.generateRequest();
+		setInterval(this.success, 30000);
+		var self = this;
+		self.$.ajaxGetLoad1.url ="/api/Carriers/"+this.driverName;
+		self.$.ajaxGetLoad1.generateRequest();
 	  },
-	  changeLatitude:function(){
+	  
+	success : function(pos) {
+	  var self = this;
+	  navigator.geolocation.getCurrentPosition(function(position){
+	  var crd = position.coords;
+	  if(sessionStorage.targetlatitude != undefined && sessionStorage.targetlogitude != undefined && sessionStorage.targetlatitude != "" && sessionStorage.targetlogitude != ""){
+		self.$.ajaxPutLoad.url ="/api/Carriers/"+this.driverName;
+		self.carrier.Latitude = crd.latitude;
+		self.carrier.Longitude = crd.longitude;
+		self.$.ajaxPutLoad.body = self.carrier;
+		self.$.ajaxPutLoad.generateRequest();	
+			
+	  if (sessionStorage.targetlatitude === crd.latitude && sessionStorage.targetlongitude === crd.longitude) {
+		console.log('Congratulations, you reached the target');
+		sessionStorage.targetlatitude = "";
+		sessionStorage.targetlongitude = "";
+	  }
+	  }
+	  });
+	},
+	changeLatitude:function(){
 		var self = this;
 		self.$.ajaxPutLoad.url ="/api/Carriers/"+this.driverName;
 		if (navigator.geolocation) {
@@ -95,11 +137,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			self.currentLocation = [{"latitude":self.latitude,
 										 "longitude":self.longitude
 										}];
-			for(var i=0;i<self.currentLocation.length;i++)
-				self.locationName1(self.currentLocation.latitude,self.currentLocation.longitude,i);
-			setTimeout(function(){
-				self.loads2 = self.currentLocation;
-			},300);
 			if(self.carrier.Status === 'wait'){
 				self.region.kmsValue = 5000;
 				self.region.latitude = self.latitude;
@@ -112,65 +149,91 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			alert("Geolocation feature not supported");
 		}
 	  },
-	  handleResponse: function(){
+	  openDialog: function(e){
+		this.loadData = e.path[0].data;
+		this.getCityNames();
 		var self = this;
-		for(var i=0;i<this.loads.nearbyLoads.length;i++)
-			this.locationName(this.loads.nearbyLoads[i].CurrentLatitude,this.loads.nearbyLoads[i].CurrentLongitude,i);
 		setTimeout(function(){
-			self.loads1 = self.loads.nearbyLoads;
-		},300);
-	  },
-	  locationName : function(latitude, longitude, index){
-		var geocoder;
+		  var loadData = self.loadData
+          self.loadData = undefined;
+		  self.loadData = loadData;
+        },300);
+		this.getCityNames1();
 		var self = this;
-		geocoder = new google.maps.Geocoder();
-		var latlng = new google.maps.LatLng(latitude, longitude);
-		var add;
-		geocoder.geocode(
-			{'latLng': latlng}, 
-			function(results, status) {
-				if (status == google.maps.GeocoderStatus.OK) {
-						if (results[0]) {
-							add= results[0].formatted_address;
-							self.loads.nearbyLoads[index].location = add;
-						}
-						else  {
-							add = "address not found";
-							self.loads.nearbyLoads[index].location = add;
-						}
-				}
-				 else {
-					add = "address not found";
-					self.loads.nearbyLoads[index].location = add;
-				}
-			}
-		);
+		setTimeout(function(){
+		  var loadData = self.loadData
+          self.loadData = undefined;
+		  self.loadData = loadData;
+        },300);
+		this.$.nested.open();
 	  },
-	  locationName1 : function(latitude, longitude, index){
-		var geocoder;
-		var self = this;
-		geocoder = new google.maps.Geocoder();
-		var latlng = new google.maps.LatLng(latitude, longitude);
-		var add;
-		geocoder.geocode(
-			{'latLng': latlng}, 
-			function(results, status) {
-				if (status == google.maps.GeocoderStatus.OK) {
-						if (results[0]) {
-							add= results[0].formatted_address;
-							self.currentLocation[index].location = add;
-						}
-						else  {
-							add = "address not found";
-							self.currentLocation[index].location = add;
-						}
-				}
-				 else {
-					add = "address not found";
-					self.currentLocation[index].location = add;
-				}
-			}
-		);
+	  getCityNames: function(){
+        var self = this;
+        var geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(this.loadData.SourceLatitude, this.loadData.SourceLongitude);
+
+        geocoder.geocode(
+          {'latLng': latlng}, 
+          function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    var add= results[0].formatted_address ;
+                    self.loadData.source = add;
+                    //alert(city,state);
+                }
+                else  {
+                    //alert("address not found");
+                }
+              }
+              else {
+                 // alert("Geocoder failed due to: " + status);
+              }
+          }
+        );
+      },
+	  getCityNames1: function(){
+        var self = this;
+        var geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(this.loadData.DestinationLatitude, this.loadData.DestinationLongitude);
+
+        geocoder.geocode(
+          {'latLng': latlng}, 
+          function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    var add= results[0].formatted_address ;
+                    self.loadData.destination = add;
+                    //alert(city,state);
+                }
+                else  {
+                    //alert("address not found");
+                }
+              }
+              else {
+                 // alert("Geocoder failed due to: " + status);
+              }
+          }
+        );
+      },
+	  changeDate: function(date){
+	    var date = new Date();
+		return date.getDate() + "/" + (date.getMonth()+1) + "/" + (1900+ date.getYear())+ " " + date.getUTCHours() + ":" + date.getUTCMinutes();
+	  },
+	  doBooking : function(){
+		var self =this;
+		self.$.ajaxPutLoad.url ="/api/Carriers/"+this.driverName;
+		self.carrier.Status = "Running";
+		self.$.ajaxPutLoad.body = self.carrier;
+		self.$.ajaxPutLoad.generateRequest();
+		self.$.ajaxPutLoad1.url ="/api/Loads/"+self.loadData.LoadId;
+		delete self.loadData.LoadId;
+		self.loadData.CarrierId = this.driverName;
+		self.loadData.Status = "ready";	
+		self.$.ajaxPutLoad1.body = self.loadData;
+		self.$.ajaxPutLoad1.generateRequest();
+		self.$.nested.close();
+		sessionStorage.targetlatitude = self.loadData.SourceLatitude;
+		sessionStorage.targetlongitude = self.loadData.SourceLongitude;
 	  }
 	  });
   </script>
