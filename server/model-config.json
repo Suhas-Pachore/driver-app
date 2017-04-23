@@ -49,5 +49,9 @@
   "Load": {
     "dataSource": "mongods",
     "public": true
+  },
+  "Favouritelocation": {
+    "dataSource": "mongods",
+    "public": true
   }
 }

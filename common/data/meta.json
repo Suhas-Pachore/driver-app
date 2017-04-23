@@ -10,5 +10,9 @@
 	{
 		"model":"Load",
 		"filename" : "load.json"
+	},
+	{
+		"model":"Favouritelocation",
+		"filename" : "favouritelocation.json"
 	}
 ]

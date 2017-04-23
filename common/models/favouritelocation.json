@@ -1,0 +1,25 @@
+{
+  "name": "Favouritelocation",
+  "plural": "Favouritelocations",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "CarrierId": {
+      "type": "string",
+	  "id":true
+    },
+    "Latitude": {
+      "type": "string"
+    },
+    "Longitude": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
