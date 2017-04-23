@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <style>
 	  :host{
-		--app-primary-color: #4285f4;
+		--app-primary-color: #4285f4	;
         --app-secondary-color: black;
         display: block;
 	  }
@@ -45,6 +45,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #212121;
         font-size: 22px;
       }
+	  .background-color{
+			display:flex;
+			background-color:var(--app-primary-color);
+			color:white;
+			height:100px;
+			margin-top:-5px;
+			margin-bottom:-5px;
+			justify-content:center;
+			align-items:center;
+		}
     </style>
   </template>
 </dom-module>

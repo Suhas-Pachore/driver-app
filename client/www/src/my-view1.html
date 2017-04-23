@@ -56,8 +56,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	</paper-dialog>
 	
 	
-    <div>
-      <h1>Hi {{carrier.Name}}</h1>
+    <div > 
+      <h1 class="background-color">Hi, {{carrier.Name}}</h1>
 			<google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
 				<template is="dom-repeat" items="{{currentLocation}}">
 					<google-map-marker latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false" animation="BOUNCE">
