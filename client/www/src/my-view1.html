@@ -35,7 +35,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  <div>Destination Address : <strong>{{loadData.destination}}</strong></div>
 	  <div>Pickup date : <strong>{{changeDate(loadData.PickupDateTime)}}</strong></div>	  
 	  <div>Delivery date : <strong>{{changeDate(loadData.DeliveryDateTime)}}</strong></div>	  
-	  <div>Load Type : <strong>{{loadData.Type}}</strong></div>	  
+	  <div>Load Type : <strong>{{loadData.Type}}</strong> </div>	 
+		<div>Status : <strong>{{loadData.Status}}</strong> </div>	  
 	  <div class="buttons">
 		<paper-button on-tap="doBooking">Book</paper-button>
 	  </div>
@@ -148,7 +149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 										 "longitude":self.longitude
 										}];
 			if(self.carrier.Status === 'wait'){
-				self.region.kmsValue = 5000;
+				self.region.kmsValue = 50000000;
 				self.region.latitude = self.latitude;
 				self.region.longitude = self.longitude;
 				self.$.ajaxGetLoad.body = self.region;
