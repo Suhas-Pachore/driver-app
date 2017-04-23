@@ -44,6 +44,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  </div>
 	</paper-dialog>
 	
+	<paper-dialog id="nested1">
+	  <div>Accept Container?</div>	  
+	  <div class="buttons">
+		<paper-button on-tap="doShipment">Yes</paper-button>
+	  </div>
+	  <div class="buttons">
+		<paper-button dialog-dismiss>No</paper-button>
+	  </div>
+	</paper-dialog>
+	
 	
     <div>
       <h1>Hi {{carrier.Name}}</h1>
@@ -96,14 +106,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			type:Object,
 			notify:true
 		}
-	  },	
+	},	
 	  attached:function(){
 		setInterval(this.success, 30000);
 		var self = this;
 		self.$.ajaxGetLoad1.url ="/api/Carriers/"+this.driverName;
 		self.$.ajaxGetLoad1.generateRequest();
 	  },
-	  
 	success : function(pos) {
 	  var self = this;
 	  navigator.geolocation.getCurrentPosition(function(position){
@@ -119,6 +128,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		console.log('Congratulations, you reached the target');
 		sessionStorage.targetlatitude = "";
 		sessionStorage.targetlongitude = "";
+		self.$.nested.open();
 	  }
 	  }
 	  });
@@ -234,6 +244,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		self.$.nested.close();
 		sessionStorage.targetlatitude = self.loadData.SourceLatitude;
 		sessionStorage.targetlongitude = self.loadData.SourceLongitude;
+	  },
+	  doShipment: function(){
+		self.$.ajaxPutLoad1.url ="/api/Loads/"+self.loadData.LoadId;
+		delete self.loadData.LoadId;
+		self.loadData.CarrierId = this.driverName;
+		self.loadData.Status = "transit";	
+		self.$.ajaxPutLoad1.body = self.loadData;
+		self.$.ajaxPutLoad1.generateRequest();
+		self.$.nested1.close();
+		sessionStorage.targetlatitude = self.loadData.DestinationLatitude;
+		sessionStorage.targetlongitude = self.loadData.DestinationLongitude;
 	  }
 	  });
   </script>
