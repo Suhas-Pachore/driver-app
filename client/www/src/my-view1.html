@@ -30,11 +30,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Hi {{carrier.Name}}</h1>
 	  <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
 		<template is="dom-repeat" items="{{currentLocation}}">
-			<google-map-marker icon="/www/images/driver-icon.jpg" latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false">
+			<google-map-marker latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false">
 			</google-map-marker>
 		</template>
 		<template is="dom-repeat" items="{{loads.nearbyLoads}}">
-          <google-map-marker icon="/www/images/Container-icon.gif" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false">
+          <google-map-marker latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false">
           </google-map-marker>
         </template>
 	  </google-map>
