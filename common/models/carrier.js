@@ -4,9 +4,41 @@ var geolib = require('geolib');
 module.exports = function(Carrier) {
 
     Carrier.getRoundtripLoads = function(msg, cb){
+        var msg = msg.body;
         var load = loopback.findModel('Load');
-        load.find(undefined, function(error, roundTrips){
-            cb(error,roundTrips);
+        var self = this;
+        var result = [];
+        load.find({},function(error, allLoads){
+            
+        var len = allLoads.length;
+        for(var i = 0 ;i<len ;i++){
+                            var neardist = Math.abs(msg.latitude - allLoads[i].SourceLatitude) + Math.abs(msg.longitude - allLoads[i].SourceLongitude);
+            if(neardist < 0.3){
+                var originaldist = Math.abs(msg.latitude - allLoads[i].DestinationLatitude) + Math.abs(msg.longitude - allLoads[i].DestinationLongitude);
+                console.log("------got near pickup-------");
+                console.log(allLoads[i].LoadId+" "+originaldist +" near dist:"+neardist);
+                for(var j=0;j<len;j++){
+                    var neardist = Math.abs(allLoads[i].DestinationLatitude - allLoads[j].SourceLatitude) + Math.abs(allLoads[i].DestinationLongitude - allLoads[j].SourceLongitude);
+                    console.log("--------------new near dist--------------");
+                    console.log(neardist);
+                    if(neardist < 0.3){
+                    var currentDist = Math.abs(allLoads[j].DestinationLatitude - msg.latitude)+
+                    Math.abs(allLoads[j].DestinationLongitude - msg.longitude);
+                        console.log("*************"+currentDist);
+                    if(originaldist >= currentDist){
+                        console.log("------got drop pickup-------");
+                        console.log(allLoads[j].LoadId +" "+currentDist);
+                        result[i] = {
+                            source : allLoads[i],
+                            drops:[allLoads[i]]
+                        };
+                        result[i].drops.push(allLoads[j]);
+                    }}
+                
+                }}
+            }
+            console.log(result);
+            cb(error,result);
         });
     }
 
@@ -33,7 +65,7 @@ module.exports = function(Carrier) {
     }
 
     Carrier.remoteMethod('getRoundtripLoads',{
-        accepts: {arg: 'msg', type:'Object'},
+        accepts: {arg: 'msg', type:'Object','http': {source: 'req'}},
         returns: {arg: 'roundtripLoads', type:'array'}
     });
 

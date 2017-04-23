@@ -22,9 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1>Roundtrips</h1>
       <template is="dom-repeat" items="{{roundtripLoadsWithCityNames}}">
         <div class="card">
-          {{item.City}},{{item.State}},{{item.PickupDateTime}},{{item.DeliveryDateTime}}
-          <hr>
-          {{item.City}},{{item.State}},{{item.PickupDateTime}},{{item.DeliveryDateTime}}
+            Location - {{item.City}}, State - {{item.State}}, Pickup Date - {{item.PickupDateTime}}, Delivery Date -{{item.DeliveryDateTime}}
         </div>
       </template>
     </div>
@@ -38,7 +36,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var region = {};
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position){
-            region.kmsValue = 5000;
             region.latitude = position.coords.latitude;
             region.longitude = position.coords.longitude;
             self.$.ajaxGetLoad.body = region;
@@ -49,8 +46,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
       handleResponse: function(){
-        this.loads = this.roundtripLoads.roundtripLoads;
+        this.loads = this.roundtripLoads.roundtripLoads[0].drops;
+          console.log(this.roundtripLoads);
         for(i=0; i<this.loads.length; i++){
+            console.log(this.loads[i]);
           this.getCityNames(i); 
         }
         var self = this;
@@ -64,8 +63,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       getCityNames: function(i){
         var self = this;
         var geocoder = new google.maps.Geocoder();
-        var latlng = new google.maps.LatLng(this.loads[i].SourceLatitude, this.loads[i].SourceLongitude);
-
+          
+        var latlng = new google.maps.LatLng(this.loads[i].DestinationLatitude, this.loads[i].DestinationLongitude);
+          
         geocoder.geocode(
           {'latLng': latlng}, 
           function(results, status) {
