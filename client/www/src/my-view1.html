@@ -12,7 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-map/google-map.html">
 <link rel="import" href="../bower_components/google-map/google-map-marker.html">
-<link rel="import" href="../bower_components/google-map-directions/google-map-directions.html">
+<link rel="import" href="../bower_components/google-map/google-map-directions.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="shared-styles.html">
@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			height:80vh;
 		}
     </style>
-	<iron-ajax id="ajaxGetLoad" url="/api/Carriers/getNearbyLoads" method='POST' handle-as="json" last-response="{{loads}}" content-type="application/json" on-response="handleResponse"></iron-ajax>
+	<iron-ajax id="ajaxGetLoad" url="/api/Carriers/getNearbyLoads" method='POST' handle-as="json" last-response="{{loads}}" content-type="application/json"></iron-ajax>
 	<iron-ajax id="ajaxGetLoad1" method='GET' handle-as="json" content-type="application/json" last-response="{{carrier}}"></iron-ajax>
 	<iron-ajax id="ajaxPutLoad" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
 	<iron-ajax id="ajaxPutLoad1" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>

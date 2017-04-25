@@ -12,22 +12,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 
+<link rel="import" href="../bower_components/google-map/google-map.html">
+<link rel="import" href="../bower_components/google-map/google-map-marker.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/google-map/google-map-directions.html">
 <dom-module id="my-view3">
   <template>
     <style include="shared-styles">
 		.flex-layout{
 			display:flex
 		}
+    .map-height{
+			height:30vh;
+		}
     </style>
     <iron-ajax id="ajaxGetLoad" url="/api/Carriers/getRoundtripLoads" method='POST' handle-as="json" on-response="handleResponse" last-response="{{roundtripLoads}}" content-type="application/json"></iron-ajax>
+    <iron-ajax id="ajaxGetLoad11" url="/api/Carriers/loadMyTrip" method='POST' handle-as="json" on-response="loadResponse" last-response="{{tripLoaded}}" content-type="application/json"></iron-ajax>
     <div>
       <h1 class="background-color">Round trip</h1>
-      <template is="dom-repeat" items="{{roundtripLoadsWithCityNames}}">
+      
+
+      <template is="dom-repeat" items="{{loadPairs}}">
         <br/>
 			
-		<div class="card" style="padding:3px;margin:0px;background-color:#E53935;">
+		<div class="card" style="padding:3px;margin:0px;background-color:#E53935;" on-tap="selectedTrip">
             <template is="dom-repeat" items="{{item}}">
 			<div class="flex-layout" style="margin:6px;background-color:rgba(255,255,255,.80);padding:9px">
               <div style="flex:2;">
@@ -47,6 +56,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </template>
         </div>
       </template>
+      
+  <google-map-directions
+      start-address="{{a}}" 
+      end-address="{{b}}"
+     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
+     
+  <google-map-directions
+      start-address="{{c}}" 
+      end-address="{{d}}"
+        
+     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
+
+  <google-map class="map-height"  map="{{map}}" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc"></google-map>
     </div>
   </template>
 
@@ -62,90 +84,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             region.longitude = position.coords.longitude;
             self.$.ajaxGetLoad.body = region;
             self.$.ajaxGetLoad.generateRequest();
+            self.$.ajaxGetLoad11.generateRequest();
           });
         } else { 
           alert("Geolocation feature not supported");
         }
       },
+      selectedTrip:function(e){
+        console.log(e);
+        this.a=e.model.__data__.item[0].srcCity;
+        this.b=e.model.__data__.item[0].dstCity;
+        this.c=e.model.__data__.item[1].srcCity;
+        this.d=e.model.__data__.item[1].dstCity;      
+      },
+      loadResponse : function(){
+        console.log(this.tripLoaded.roundtripLoads);
+      },
 	  changeDate: function(date){
-	    var date = new Date();
+	    var date = new Date(date);
 		return date.getDate() + "/" + (date.getMonth()+1) + "/" + (1900+ date.getYear())+ " " + date.getUTCHours() + ":" + date.getUTCMinutes();
 	  },
       handleResponse: function(){
         this.loadPairs = this.roundtripLoads.roundtripLoads;
-        for(i=0; i<this.loadPairs.length; i++){
-            console.log(this.loadPairs[i]);
-            this.getCityNames(i,0); 
-            this.getCityNames(i,1); 
-        }
-        var self = this;
-        setTimeout(function(){
-          self.roundtripLoadsWithCityNames = undefined;
-          self.roundtripLoadsWithCityNames = self.loadPairs;
-        },700);
-
-
-      },
-      getCityNames: function(i,j){
-        var self = this;
-        var geocoder1 = new google.maps.Geocoder();
-          
-        var latlng1 = new google.maps.LatLng(this.loadPairs[i][j].SourceLatitude, this.loadPairs[i][j].SourceLongitude);
-          
-        geocoder1.geocode(
-          {'latLng': latlng1}, 
-          function(results, status) {
-              if (status == google.maps.GeocoderStatus.OK) {
-                if (results[0]) {
-                    var add= results[0].formatted_address ;
-                    var  value=add.split(",");
-
-                    var count=value.length;
-                    var country=value[count-1];
-                    var state=value[count-2];
-                    var city=value[count-3];
-                    self.loadPairs[i][j].srcCity = city;
-                    self.loadPairs[i][j].srcState = state;
-                    //alert(city,state);
-                }
-                else  {
-                    //alert("address not found");
-                }
-              }
-              else {
-                 // alert("Geocoder failed due to: " + status);
-              }
-          }
-        );
-
-        var geocoder2 = new google.maps.Geocoder();
-        var latlng2 = new google.maps.LatLng(this.loadPairs[i][j].DestinationLatitude, this.loadPairs[i][j].DestinationLongitude);
-          
-        geocoder2.geocode(
-          {'latLng': latlng2}, 
-          function(results, status) {
-              if (status == google.maps.GeocoderStatus.OK) {
-                if (results[0]) {
-                    var add= results[0].formatted_address ;
-                    var  value=add.split(",");
-
-                    var count=value.length;
-                    var country=value[count-1];
-                    var state=value[count-2];
-                    var city=value[count-3];
-                    self.loadPairs[i][j].dstCity = city;
-                    self.loadPairs[i][j].dstState = state;
-                    //alert(city,state);
-                }
-                else  {
-                    //alert("address not found");
-                }
-              }
-              else {
-                 // alert("Geocoder failed due to: " + status);
-              }
-          }
-        );
+       
       }
     });
   </script>
