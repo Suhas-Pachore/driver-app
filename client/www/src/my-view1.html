@@ -43,9 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  <div class="buttons">
 		<paper-button dialog-dismiss>Cancel</paper-button>
 	  </div>
-	  <div class="buttons">
-		<paper-button>Get Direction</paper-button>
-	  </div>
+	
 	</paper-dialog>
 	
 	<paper-dialog id="nested1">
@@ -61,7 +59,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	
     <div > 
       <h1 class="background-color">Hi, {{carrier.Name}}</h1>
-			<google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
+			<google-map-directions
+      start-address="{{a}}" 
+      end-address="{{b}}"
+     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
+
+			<google-map fit-to-marker latitude="{{latitude}}" map="{{map}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
 				<template is="dom-repeat" items="{{currentLocation}}">
 					<google-map-marker latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false" animation="BOUNCE">
 					</google-map-marker>
@@ -164,7 +167,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		}
 	  },
 	  openDialog: function(e){
-		this.loadData = e.path[0].data;
+			console.log(e);
+		this.loadData = e.model.__data__.item;
 		this.getCityNames();
 		var self = this;
 		setTimeout(function(){
@@ -248,6 +252,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		self.$.nested.close();
 		sessionStorage.targetlatitude = self.loadData.SourceLatitude;
 		sessionStorage.targetlongitude = self.loadData.SourceLongitude;
+		this.a = self.loadData.srcCity;
+		this.b = self.loadData.dstCity;
 	  },
 	  doShipment: function(){
 		self.$.ajaxPutLoad1.url ="/api/Loads/"+self.loadData.LoadId;

@@ -27,6 +27,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			height:30vh;
 		}
     </style>
+
+    <paper-dialog id="nested11">
+       <google-map-directions
+      start-address="{{a}}" 
+      end-address="{{b}}"
+     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
+     
+  <google-map-directions
+      start-address="{{c}}" 
+      end-address="{{d}}"
+        
+     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
+
+  <google-map class="map-height"  map="{{map}}" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" style="width: 236px"></google-map>
+	  </paper-dialog>
+	
+
     <iron-ajax id="ajaxGetLoad" url="/api/Carriers/getRoundtripLoads" method='POST' handle-as="json" on-response="handleResponse" last-response="{{roundtripLoads}}" content-type="application/json"></iron-ajax>
     <iron-ajax id="ajaxGetLoad11" url="/api/Carriers/loadMyTrip" method='POST' handle-as="json" on-response="loadResponse" last-response="{{tripLoaded}}" content-type="application/json"></iron-ajax>
     <div>
@@ -57,18 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </template>
       
-  <google-map-directions
-      start-address="{{a}}" 
-      end-address="{{b}}"
-     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
-     
-  <google-map-directions
-      start-address="{{c}}" 
-      end-address="{{d}}"
-        
-     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
-
-  <google-map class="map-height"  map="{{map}}" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc"></google-map>
+ 
     </div>
   </template>
 
@@ -76,26 +82,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     Polymer({
       is: 'my-view3',
       attached: function(){
+        
         var self = this;
         var region = {};
         if (navigator.geolocation) {
+          console.log(navigator.geolocation);
           navigator.geolocation.getCurrentPosition(function(position){
             region.latitude = position.coords.latitude;
             region.longitude = position.coords.longitude;
             self.$.ajaxGetLoad.body = region;
             self.$.ajaxGetLoad.generateRequest();
             self.$.ajaxGetLoad11.generateRequest();
+            console.log("???????????????????");
           });
         } else { 
           alert("Geolocation feature not supported");
         }
       },
       selectedTrip:function(e){
-        console.log(e);
+        this.$.nested11.open();
         this.a=e.model.__data__.item[0].srcCity;
         this.b=e.model.__data__.item[0].dstCity;
         this.c=e.model.__data__.item[1].srcCity;
-        this.d=e.model.__data__.item[1].dstCity;      
+        this.d=e.model.__data__.item[1].dstCity;
+        console.log(e.model.__data__.item);
+        console.log(this.a + " "+this.b + " "+this.c + " "+this.a + " ");      
       },
       loadResponse : function(){
         console.log(this.tripLoaded.roundtripLoads);
