@@ -29,13 +29,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h1 class="background-color">XPO Tracking Dashboard</h1>
       <google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
         <template is="dom-repeat" items="{{loads}}">
-          <google-map-marker icon="/www/img/Container-icon.gif" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false"></google-map-marker>
+          <google-map-marker icon="/android_asset/www/img/Container-icon.gif" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false"></google-map-marker>
         </template>
         <template is="dom-repeat" items="{{dispatches}}">
-          <google-map-marker icon="/www/img/xpo-truck.png" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false"></google-map-marker>
+          <google-map-marker icon="/android_asset/www/img/xpo-truck.png" latitude="{{item.CurrentLatitude}}" longitude="{{item.CurrentLongitude}}" draggable="false"></google-map-marker>
         </template>
         <template is="dom-repeat" items="{{driversWaiting}}">
-          <google-map-marker icon="/www/img/driver-icon.jpg" latitude="{{item.Latitude}}" longitude="{{item.Longitude}}" draggable="false"></google-map-marker>
+          <google-map-marker icon="/android_asset/www/img/driver-icon.jpg" latitude="{{item.Latitude}}" longitude="{{item.Longitude}}" draggable="false"></google-map-marker>
         </template>
       </google-map>
    </div>

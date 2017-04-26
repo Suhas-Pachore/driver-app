@@ -67,7 +67,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					</google-map-marker>
 				</template>
 				<template is="dom-repeat" items="{{loads.nearbyLoads}}">
-					<google-map-marker latitude="{{item.CurrentLatitude}}" data="{{item}}" id="{{item.CustomerId}}" longitude="{{item.CurrentLongitude}}" draggable="false" animation="BOUNCE" click-events="true" on-google-map-marker-click="openDialog">
+					<google-map-marker icon="/android_asset/www/img/Container-icon.gif" latitude="{{item.CurrentLatitude}}" data="{{item}}" id="{{item.CustomerId}}" longitude="{{item.CurrentLongitude}}" draggable="false" animation="BOUNCE" click-events="true" on-google-map-marker-click="openDialog">
 					</google-map-marker>
 				</template>
 			</google-map>
@@ -138,32 +138,56 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  });
 	},
 	changeLatitude:function(){
+		console.log('in change lati function');
 		var self = this;
 		self.$.ajaxPutLoad.url ="/api/Carriers/"+this.driverName;
 		if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position){
-			self.latitude = position.coords.latitude;
-			self.longitude = position.coords.longitude;
-			self.carrier.Latitude = self.latitude;
-			self.carrier.Longitude = self.longitude;
-			self.$.ajaxPutLoad.body = self.carrier;
-			self.$.ajaxPutLoad.generateRequest();
-			self.currentLocation = [{"latitude":self.latitude,
-										 "longitude":self.longitude
-										}];
-			if(self.carrier.Status === 'wait'){
-				self.region.kmsValue = 50000000;
-				self.region.latitude = self.latitude;
-				self.region.longitude = self.longitude;
-				self.$.ajaxGetLoad.body = self.region;
-				self.$.ajaxGetLoad.generateRequest();
-			}
-		});
+			navigator.geolocation.getCurrentPosition(function(position){
+				console.log('geo current positiom found');
+				self.latitude = position.coords.latitude;
+				self.longitude = position.coords.longitude;
+				self.carrier.Latitude = self.latitude;
+				self.carrier.Longitude = self.longitude;
+				self.$.ajaxPutLoad.body = self.carrier;
+				self.$.ajaxPutLoad.generateRequest();
+				self.currentLocation = [{"latitude":self.latitude,
+											"longitude":self.longitude
+											}];
+				if(self.carrier.Status === 'wait'){
+					self.region.kmsValue = 50000000;
+					self.region.latitude = self.latitude;
+					self.region.longitude = self.longitude;
+					self.$.ajaxGetLoad.body = self.region;
+					self.$.ajaxGetLoad.generateRequest();
+				}
+			},function(error){
+						console.log('code: '    + error.code    + '\n' +
+						'message: ' + error.message + '\n');
+
+						self.latitude = 18.60;
+						self.longitude = 73.70;
+						self.carrier.Latitude = self.latitude;
+						self.carrier.Longitude = self.longitude;
+						self.$.ajaxPutLoad.body = self.carrier;
+						self.$.ajaxPutLoad.generateRequest();
+						self.currentLocation = [{"latitude":self.latitude,
+													"longitude":self.longitude
+													}];
+						if(self.carrier.Status === 'wait'){
+							self.region.kmsValue = 50000000;
+							self.region.latitude = self.latitude;
+							self.region.longitude = self.longitude;
+							self.$.ajaxGetLoad.body = self.region;
+							self.$.ajaxGetLoad.generateRequest();
+						}
+
+			}, { timeout: 3000, enableHighAccuracy: false });
 		} else { 
+			console.log('geo not found');
 			alert("Geolocation feature not supported");
 		}
-	  },
-	  openDialog: function(e){
+	},
+	openDialog: function(e){
 		this.loadData = e.path[0].data;
 		this.getCityNames();
 		var self = this;
