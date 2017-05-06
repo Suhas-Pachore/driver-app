@@ -12,7 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-map/google-map.html">
 <link rel="import" href="../bower_components/google-map/google-map-marker.html">
-<link rel="import" href="../bower_components/google-map-directions/google-map-directions.html">
+<link rel="import" href="../bower_components/google-map/google-map-directions.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="shared-styles.html">
@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			height:80vh;
 		}
     </style>
-	<iron-ajax id="ajaxGetLoad" url="/api/Carriers/getNearbyLoads" method='POST' handle-as="json" last-response="{{loads}}" content-type="application/json" on-response="handleResponse"></iron-ajax>
+	<iron-ajax id="ajaxGetLoad" url="/api/Carriers/getNearbyLoads" method='POST' handle-as="json" last-response="{{loads}}" content-type="application/json"></iron-ajax>
 	<iron-ajax id="ajaxGetLoad1" method='GET' handle-as="json" content-type="application/json" last-response="{{carrier}}"></iron-ajax>
 	<iron-ajax id="ajaxPutLoad" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
 	<iron-ajax id="ajaxPutLoad1" method='PUT' handle-as="json" content-type="application/json"></iron-ajax>
@@ -43,9 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  <div class="buttons">
 		<paper-button dialog-dismiss>Cancel</paper-button>
 	  </div>
-	  <div class="buttons">
-		<paper-button>Get Direction</paper-button>
-	  </div>
+	
 	</paper-dialog>
 	
 	<paper-dialog id="nested1">
@@ -61,7 +59,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	
     <div > 
       <h1 class="background-color">Hi, {{carrier.Name}}</h1>
-			<google-map fit-to-marker latitude="{{latitude}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
+			<google-map-directions
+      start-address="{{a}}" 
+      end-address="{{b}}"
+     api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc" map="[[map]]"></google-map-directions>
+
+			<google-map fit-to-marker latitude="{{latitude}}" map="{{map}}" longitude="{{longitude}}" class="map-height" api-key="AIzaSyD3E1D9b-Z7ekrT3tbhl_dy8DCXuIuDDRc">
 				<template is="dom-repeat" items="{{currentLocation}}">
 					<google-map-marker latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="false" animation="BOUNCE">
 					</google-map-marker>
@@ -186,9 +189,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			console.log('geo not found');
 			alert("Geolocation feature not supported");
 		}
-	},
-	openDialog: function(e){
-		this.loadData = e.path[0].data;
+	  },
+	  openDialog: function(e){
+			console.log(e);
+		this.loadData = e.model.__data__.item;
 		this.getCityNames();
 		var self = this;
 		setTimeout(function(){
@@ -272,6 +276,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		self.$.nested.close();
 		sessionStorage.targetlatitude = self.loadData.SourceLatitude;
 		sessionStorage.targetlongitude = self.loadData.SourceLongitude;
+		this.a = self.loadData.srcCity;
+		this.b = self.loadData.dstCity;
 	  },
 	  doShipment: function(){
 		self.$.ajaxPutLoad1.url ="/api/Loads/"+self.loadData.LoadId;

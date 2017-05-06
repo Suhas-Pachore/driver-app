@@ -3,6 +3,17 @@ var loopback = require('loopback');
 var geolib = require('geolib');
 module.exports = function(Carrier) {
 
+        Carrier.loadMyTrip = function(msg, cb){
+        var msg = msg.body;
+        var load = loopback.findModel('Load');
+        var self = this;
+        var result = [];
+        load.find({},function(error, allLoads){
+            console.log(result);
+            cb(error,allLoads);
+        });
+    }
+
     Carrier.getRoundtripLoads = function(msg, cb){
         var msg = msg.body;
         var load = loopback.findModel('Load');
@@ -16,34 +27,34 @@ module.exports = function(Carrier) {
             var neardist = Math.abs(msg.latitude - allLoads[i].SourceLatitude) + Math.abs(msg.longitude - allLoads[i].SourceLongitude);
             if(neardist < 0.3){
                 var originaldist = Math.abs(msg.latitude - allLoads[i].DestinationLatitude) + Math.abs(msg.longitude - allLoads[i].DestinationLongitude);
-                console.log("------got near pickup-------");
-                console.log(allLoads[i].LoadId+" "+originaldist +" near dist:"+neardist);
+                console.log("NEAR PICKUP");
+                console.log(allLoads[i].LoadId+"\t ORIGINAL DISTANCE "+originaldist +" \t NEAR DISTANCE "+neardist);
                 for(var j=0;j<len;j++){
                     var minDiff = undefined;
                     
                     var neardist = Math.abs(allLoads[i].DestinationLatitude - allLoads[j].SourceLatitude) + Math.abs(allLoads[i].DestinationLongitude - allLoads[j].SourceLongitude);
-                    console.log("--------------new near dist--------------");
-                    console.log(neardist);
+                    
                     if(neardist < 0.3){
                         var currentDist = Math.abs(allLoads[j].DestinationLatitude - msg.latitude)+
                         Math.abs(allLoads[j].DestinationLongitude - msg.longitude);
-                            console.log("*************"+currentDist);
+                            console.log("\t NEAR DISTANCE \t"+" LOADID "+allLoads[j].LoadId+"\t BACK DISTANCE "+currentDist);
                         if(originaldist >= currentDist){
-                            console.log("------got drop pickup-------");
                             if((minDiff == undefined) || (minDiff > currentDist)){
                                 minDiff = currentDist;
+                                console.log("ADDING ID "+allLoads[j].LoadId);
                                 selectedPair = [allLoads[i],allLoads[j]];
-                            } 
-                            console.log(allLoads[j].LoadId +" "+currentDist);
+                                                console.log("\n");
 
-                    }}
-                
+                            } 
+                     }}
                 }
-                result.push(selectedPair) ;
+                if(selectedPair.length > 0){
+                    result.push(selectedPair) ;
+                console.log("\n");}
                 
                 }
             }
-            console.log(result);
+            //console.log(result);
             cb(error,result);
         });
     }
@@ -71,6 +82,11 @@ module.exports = function(Carrier) {
     }
 
     Carrier.remoteMethod('getRoundtripLoads',{
+        accepts: {arg: 'msg', type:'Object','http': {source: 'req'}},
+        returns: {arg: 'roundtripLoads', type:'array'}
+    });
+
+    Carrier.remoteMethod('loadMyTrip',{
         accepts: {arg: 'msg', type:'Object','http': {source: 'req'}},
         returns: {arg: 'roundtripLoads', type:'array'}
     });

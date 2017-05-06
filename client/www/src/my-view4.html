@@ -50,7 +50,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           navigator.geolocation.getCurrentPosition(function(position){
             self.latitude = position.coords.latitude;
             self.longitude = position.coords.longitude;
-          });
+          },function(error){
+						console.log('code: '    + error.code    + '\n' +
+						'message: ' + error.message + '\n');
+
+						self.latitude = 18.60;
+						self.longitude = 73.70;
+						}, { timeout: 3000, enableHighAccuracy: false });
         } else { 
           alert("Geolocation feature not supported");
         }
